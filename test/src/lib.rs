@@ -27,14 +27,14 @@
 // #![warn(clippy::cargo, clippy::restriction, missing_docs, warnings)]
 // #![allow(clippy::implicit_return)]
 
-mod consts;
-mod cpu;
-mod error;
-mod memory;
-mod main;
+mod args;
+pub mod consts;
+pub mod error;
 
-pub use {
-    cpu::Cpu,
-    error::{Error, Result},
-    memory::Memory,
-};
+pub use args::Args;
+use error::Result;
+
+#[allow(clippy::missing_const_for_fn, clippy::needless_pass_by_value)] //remove when `lib_main` impl'ed
+pub fn lib_main(_args: Args) -> Result<()> {
+    Ok(())
+}

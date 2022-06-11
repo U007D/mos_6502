@@ -5,27 +5,23 @@ description = "<describe crate here>"
 edition = "2021"
 keywords = []
 license = "MIT OR Apache-2.0"
-name = "mos_6502"
+name = "test"
 readme = "README.md"
-repository = "https://github.com/u007d/mos_6502"
+repository = "https://github.com/u007d/test"
 version = "0.1.0"
 
 [lib]
-name = "mos_6502"
+name = "lib"
 path = "src/lib.rs"
 
-[[bin]]
-name = "mos_6502"
-path = "src/main.rs"
-
 [dependencies]
-thiserror = "1.0.31"
+structopt = "*"
+thiserror = "*"
 
 [dev-dependencies]
-assert2 = "0.3.6"
+assert2 = "*"
 
 [profile.dev]
-codegen-units = 1
 debug = true
 debug-assertions = true
 lto = false
@@ -37,13 +33,12 @@ rpath = false
 codegen-units = 1
 debug = false
 debug-assertions = false
-lto = true
+lto = "fat"
 opt-level = 3
 panic = "unwind"
 rpath = false
 
 [profile.test]
-codegen-units = 1
 debug = true
 debug-assertions = true
 lto = false

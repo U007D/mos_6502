@@ -27,14 +27,9 @@
 // #![warn(clippy::cargo, clippy::restriction, missing_docs, warnings)]
 // #![allow(clippy::implicit_return)]
 
-mod consts;
-mod cpu;
-mod error;
-mod memory;
-mod main;
+use lib::{self, error::Result, lib_main, Args};
+use structopt::StructOpt;
 
-pub use {
-    cpu::Cpu,
-    error::{Error, Result},
-    memory::Memory,
-};
+fn main() -> Result<()> {
+    lib_main(Args::from_args())
+}
