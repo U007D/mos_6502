@@ -1,3 +1,4 @@
+#![allow(clippy::indexing_slicing)]
 mod mode;
 mod opcode;
 mod stack;
@@ -12,10 +13,9 @@ pub use stack::Stack;
 pub use status::Status;
 pub use vector_table::VectorTable;
 
-use crate::cpu::mode::Mode::Halt;
+use crate::{cpu::mode::Mode::Halt, memory::ZeroPageAddress};
 use mode::Mode;
 use opcode::U8OpcodeExt;
-use crate::memory::ZeroPageAddress;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Cpu {
@@ -44,6 +44,7 @@ impl Cpu {
         }
     }
 
+    // TODO: Hide direct register access to ensure use of accessors to guarantee side-effectful register writes
     #[must_use]
     pub const fn a(&self) -> u8 { self.a }
 
@@ -58,7 +59,10 @@ impl Cpu {
 
             Mode::AFetchZeroPageOperand => {
                 let address = self.fetch_zero_page_address_operand();
-                #[allow(clippy::indexing_slicing)]
+                Ok(Mode::ADerefZeroPageAddr(address))
+            },
+
+            Mode::ADerefZeroPageAddr(address) => {
                 self.set_a(self.memory[address]);
                 Ok(Mode::FetchInstruction)
             },
@@ -76,9 +80,7 @@ impl Cpu {
         })
     }
 
-    fn fetch_immediate_operand(&mut self) -> u8 {
-        self.fetch_byte()
-    }
+    fn fetch_immediate_operand(&mut self) -> u8 { self.fetch_byte() }
 
     fn fetch_instruction(&mut self) -> ExecutionResult<Opcode> {
         #[allow(clippy::indexing_slicing)]
@@ -86,16 +88,16 @@ impl Cpu {
         res_opcode
     }
 
-    fn fetch_zero_page_address_operand(&mut self) -> ZeroPageAddress {
-        self.fetch_byte().into()
-    }
+    fn fetch_zero_page_address_operand(&mut self) -> ZeroPageAddress { self.fetch_byte().into() }
 
     fn fetch_byte(&mut self) -> u8 {
         #[allow(clippy::indexing_slicing)]
-            let data = self.memory[self.pc];
+        let byte = self.read_byte();
         self.pc.inc();
-        data
+        byte
     }
+
+    pub fn read_byte(&mut self) -> u8 { self.memory[self.pc] }
 
     pub fn set_a(&mut self, value: u8) -> &mut Self {
         self.a = value;
@@ -118,6 +120,5 @@ impl Cpu {
     pub const fn x(&self) -> u8 { self.x }
 
     #[must_use]
-    pub const fn y(&self) -> u8 { self.y}
-
+    pub const fn y(&self) -> u8 { self.y }
 }
