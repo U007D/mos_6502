@@ -12,11 +12,11 @@ fn all_status_register_fields_of_newly_constructed_cpu_are_zero() {
     let result = new(memory);
     
     // Then
-    assert!(result.status().is_b() == expected_status);
-    assert!(result.status().is_c() == expected_status);
-    assert!(result.status().is_d() == expected_status);
-    assert!(result.status().is_i() == expected_status);
-    assert!(result.status().is_n() == expected_status);
-    assert!(result.status().is_v() == expected_status);
-    assert!(result.status().is_z() == expected_status);
+    assert!(result.status().b() == expected_status);
+    assert!(result.status().c() == expected_status);
+    assert!(result.status().d() == expected_status);
+    assert!(result.status().i() == expected_status);
+    assert!(result.status().n() == expected_status);
+    assert!(result.status().v() == expected_status);
+    assert!(result.status().z() == expected_status);
 }
