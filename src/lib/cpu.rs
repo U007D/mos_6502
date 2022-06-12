@@ -12,9 +12,10 @@ pub use stack::Stack;
 pub use status::Status;
 pub use vector_table::VectorTable;
 
-use crate::cpu::mode::Mode::Halted;
+use crate::cpu::mode::Mode::Halt;
 use mode::Mode;
 use opcode::U8OpcodeExt;
+use crate::memory::ZeroPageAddress;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Cpu {
@@ -43,47 +44,80 @@ impl Cpu {
         }
     }
 
+    #[must_use]
+    pub const fn a(&self) -> u8 { self.a }
+
     pub fn execute(&mut self, clock_cycles: usize, start: Address) -> ExecutionResult<Mode<'_>> {
         self.pc = start;
         (0..clock_cycles).try_fold(Mode::FetchInstruction, |mode, _cycle| match mode {
+            Mode::AFetchImmediateOperand => {
+                let value = self.fetch_immediate_operand();
+                self.set_a(value);
+                Ok(Mode::FetchInstruction)
+            },
+
+            Mode::AFetchZeroPageOperand => {
+                let address = self.fetch_zero_page_address_operand();
+                #[allow(clippy::indexing_slicing)]
+                self.set_a(self.memory[address]);
+                Ok(Mode::FetchInstruction)
+            },
+
             Mode::FetchInstruction => {
                 use Opcode::*;
 
                 self.fetch_instruction().map(|instruction| match instruction {
-                    LdaImmediate => Mode::FetchAImmediateOperand,
+                    LdaImm => Mode::AFetchImmediateOperand,
+                    LdaZp => Mode::AFetchZeroPageOperand,
                 })
             },
-            Mode::FetchAImmediateOperand => {
-                self.a = self.fetch_immediate_operand();
-                match self.a {
-                    0 => {
-                        self.status.set_z();
-                    },
-                    value if value & 0b1000_0000 != 0 => {
-                        self.status.set_n();
-                    },
-                    _ => (),
-                }
-                Ok(Mode::FetchInstruction)
-            },
-            Mode::Halted(cpu) => Ok(Halted(cpu)),
+
+            Mode::Halt(cpu) => Ok(Halt(cpu)),
         })
     }
 
-    pub fn fetch_immediate_operand(&mut self) -> u8 {
+    fn fetch_immediate_operand(&mut self) -> u8 {
+        self.fetch_byte()
+    }
+
+    fn fetch_instruction(&mut self) -> ExecutionResult<Opcode> {
         #[allow(clippy::indexing_slicing)]
-        let data = self.memory[self.pc];
+        let res_opcode = self.fetch_byte().to_opcode();
+        res_opcode
+    }
+
+    fn fetch_zero_page_address_operand(&mut self) -> ZeroPageAddress {
+        self.fetch_byte().into()
+    }
+
+    fn fetch_byte(&mut self) -> u8 {
+        #[allow(clippy::indexing_slicing)]
+            let data = self.memory[self.pc];
         self.pc.inc();
         data
     }
 
-    pub fn fetch_instruction(&mut self) -> ExecutionResult<Opcode> {
-        #[allow(clippy::indexing_slicing)]
-        let res_opcode = self.memory[self.pc].to_opcode();
-        self.pc.inc();
-        res_opcode
+    pub fn set_a(&mut self, value: u8) -> &mut Self {
+        self.a = value;
+        match value {
+            0 => {
+                self.status.set_z();
+            },
+            n if n & 0b1000_0000 != 0 => {
+                self.status.set_n();
+            },
+            _ => (),
+        };
+        self
     }
 
     #[must_use]
     pub const fn status(&self) -> &Status { &self.status }
+
+    #[must_use]
+    pub const fn x(&self) -> u8 { self.x }
+
+    #[must_use]
+    pub const fn y(&self) -> u8 { self.y}
+
 }

@@ -5,16 +5,17 @@ use once_cell::sync::Lazy;
 use super::*;
 use crate::{
     error::execution::{Error, Result},
-    Sealed,
+    ISealed,
 };
 
 static U8_TO_OPCODE_LOOKUP: Lazy<HashMap<u8, Opcode>> = Lazy::new(|| {
     let mut lut = HashMap::new();
-    lut.insert(Opcode::LdaImmediate as u8, Opcode::LdaImmediate);
+    lut.insert(Opcode::LdaImm as u8, Opcode::LdaImm);
+    lut.insert(Opcode::LdaZp as u8, Opcode::LdaZp);
     lut
 });
 
-pub trait U8OpcodeExt: Sealed
+pub trait U8OpcodeExt: ISealed
 where
     Self: Copy, {
     fn to_opcode(self) -> Result<Opcode>;
@@ -26,4 +27,4 @@ impl U8OpcodeExt for u8 {
     }
 }
 
-impl Sealed for u8 {}
+impl ISealed for u8 {}

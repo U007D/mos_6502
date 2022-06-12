@@ -2,7 +2,8 @@ use crate::Cpu;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Mode<'cpu> {
+    AFetchImmediateOperand,
+    AFetchZeroPageOperand,
     FetchInstruction,
-    FetchAImmediateOperand,
-    Halted(&'cpu Cpu)
+    Halt(&'cpu Cpu)
 }

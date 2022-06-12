@@ -34,9 +34,13 @@ mod consts;
 mod cpu;
 mod error;
 mod memory;
-mod sealed;
+mod traits;
+mod utils;
 
 pub use cpu::{Cpu, VectorTable};
 pub use error::{Error, Result};
-pub use memory::Memory;
-use sealed::Sealed;
+pub use memory::{Address, Memory, ZeroPageAddress};
+pub use traits::IAddress;
+use traits::ISealed;
+#[cfg(test)]
+use utils::catch_unwind_silent;
