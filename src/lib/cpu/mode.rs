@@ -6,5 +6,5 @@ pub enum Mode<'cpu> {
     AFetchZeroPageOperand,
     ADerefZeroPageAddr(ZeroPageAddress),
     FetchInstruction,
-    Halt(&'cpu Cpu)
+    Halt(&'cpu Cpu),
 }

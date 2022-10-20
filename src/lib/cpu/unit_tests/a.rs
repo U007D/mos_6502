@@ -17,13 +17,12 @@ fn default_initialized_register_returns_expected_value() {
     assert!(result == expected);
 }
 
-
 #[test]
 fn modified_register_returns_expected_value() {
     // Given
     let expected_value = 42;
     let capacity = 2;
-    let cycle_budget = 2;
+    let cycle_budget = 2.into();
     let memory = {
         let mut tmp = Memory::new(capacity).unwrap();
         // LDA #42
@@ -32,7 +31,7 @@ fn modified_register_returns_expected_value() {
         tmp
     };
     let mut cpu = Cpu::new(memory);
-    cpu.execute(cycle_budget, 0.into()).unwrap();
+    cpu.execute(0.into(), cycle_budget).unwrap();
 
     // When
     let result = cpu.a();

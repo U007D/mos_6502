@@ -10,7 +10,7 @@ fn all_status_register_fields_of_newly_constructed_cpu_are_zero() {
 
     // When
     let result = new(memory);
-    
+
     // Then
     assert!(result.status().b() == expected_status);
     assert!(result.status().c() == expected_status);

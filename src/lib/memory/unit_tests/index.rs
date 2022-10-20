@@ -10,7 +10,8 @@ fn read_valid_unmodified_memory_locations_returns_default_value() {
     let memory = Memory::new(capacity).unwrap();
 
     // When
-    let result = (0..capacity).all(|index| memory[Address::from(u16::try_from(index).unwrap())] == default_value);
+    let result = (0..capacity)
+        .all(|index| memory[Address::from(u16::try_from(index).unwrap())] == default_value);
 
     // Then
     assert!(result);
@@ -41,8 +42,8 @@ fn read_valid_unmodified_zero_page_memory_locations_returns_default_value() {
     let memory = Memory::new(capacity).unwrap();
 
     // When
-    let result =
-        (0..capacity).all(|index| memory[ZeroPageAddress::from(u8::try_from(index).unwrap())] == default_value);
+    let result = (0..capacity)
+        .all(|index| memory[ZeroPageAddress::from(u8::try_from(index).unwrap())] == default_value);
 
     // Then
     assert!(result);

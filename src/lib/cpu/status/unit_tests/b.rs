@@ -10,7 +10,7 @@ fn default_value_is_clear() {
 
     // When
     let result = status_register.b();
-    
+
     // Then
     assert!(result == expected);
 }

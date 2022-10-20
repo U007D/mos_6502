@@ -10,10 +10,12 @@ fn write_valid_memory_locations_returns_expected_value() {
     let mut memory = Memory::new(capacity).unwrap();
 
     // When
-    (0..capacity).for_each(|index| memory[Address::from(u16::try_from(index).unwrap())] = new_value);
+    (0..capacity)
+        .for_each(|index| memory[Address::from(u16::try_from(index).unwrap())] = new_value);
 
     // Then
-    assert!((0..capacity).all(|index| memory[Address::from(u16::try_from(index).unwrap())] == new_value));
+    assert!((0..capacity)
+        .all(|index| memory[Address::from(u16::try_from(index).unwrap())] == new_value));
 }
 
 #[test]
@@ -43,10 +45,12 @@ fn write_valid_zero_page_memory_locations_returns_expected_value() {
     let mut memory = Memory::new(capacity).unwrap();
 
     // When
-    (0..capacity).for_each(|index| memory[ZeroPageAddress::from(u8::try_from(index).unwrap())] = new_value);
+    (0..capacity)
+        .for_each(|index| memory[ZeroPageAddress::from(u8::try_from(index).unwrap())] = new_value);
 
     // Then
-    assert!((0..capacity).all(|index| memory[ZeroPageAddress::from(u8::try_from(index).unwrap())] == new_value));
+    assert!((0..capacity)
+        .all(|index| memory[ZeroPageAddress::from(u8::try_from(index).unwrap())] == new_value));
 }
 
 #[test]

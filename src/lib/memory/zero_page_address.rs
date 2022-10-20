@@ -1,7 +1,8 @@
-use std::ops::Deref;
+use std::{fmt::Debug, ops::Deref};
+
 use crate::IAddress;
 
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct ZeroPageAddress(u8);
 
 impl ZeroPageAddress {
@@ -12,18 +13,26 @@ impl ZeroPageAddress {
     }
 }
 
-impl Deref for ZeroPageAddress {
-    type Target = u8;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl Debug for ZeroPageAddress {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ZeroPageAddress({:#04x}/{})", self.0, self.0)
     }
 }
 
+// `const` trait impl not derivable at time of writing
+#[allow(clippy::derivable_impls)]
+impl const Default for ZeroPageAddress {
+    fn default() -> Self { Self(u8::default()) }
+}
+
+impl Deref for ZeroPageAddress {
+    type Target = u8;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
 impl const From<u8> for ZeroPageAddress {
-    fn from(value: u8) -> Self {
-        Self(value)
-    }
+    fn from(value: u8) -> Self { Self(value) }
 }
 
 impl IAddress for ZeroPageAddress {}

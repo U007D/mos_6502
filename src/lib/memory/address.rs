@@ -1,7 +1,7 @@
-use std::ops::Deref;
+use std::{fmt::Debug, ops::Deref};
 use crate::IAddress;
 
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Address(u16);
 
 impl Address {
@@ -12,18 +12,26 @@ impl Address {
     }
 }
 
-impl Deref for Address {
-    type Target = u16;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl Debug for Address {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Address({:#06x}/{})", self.0, self.0)
     }
 }
 
+// `const` trait impl not derivable at time of writing
+#[allow(clippy::derivable_impls)]
+impl const Default for Address {
+    fn default() -> Self { Self(u16::default()) }
+}
+
+impl Deref for Address {
+    type Target = u16;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
 impl const From<u16> for Address {
-    fn from(value: u16) -> Self {
-        Self(value)
-    }
+    fn from(value: u16) -> Self { Self(value) }
 }
 
 impl IAddress for Address {}

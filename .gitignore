@@ -8,6 +8,7 @@
 
 # User-specific stuff
 **/.idea/
+**/.fleet
 
 # File-based project format
 *.iws

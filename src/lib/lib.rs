@@ -1,4 +1,4 @@
-#![feature(const_convert, const_trait_impl, const_option)]
+#![feature(const_convert, const_default_impls, const_option_ext, const_trait_impl)]
 #![warn(clippy::all, clippy::nursery, clippy::pedantic, rust_2018_idioms)]
 // Safety-critical application lints
 #![deny(
@@ -31,7 +31,7 @@
 // #![allow(clippy::implicit_return)]
 
 mod consts;
-mod cpu;
+pub mod cpu;
 mod error;
 mod memory;
 mod traits;
@@ -41,6 +41,5 @@ pub use cpu::{Cpu, VectorTable};
 pub use error::{Error, Result};
 pub use memory::{Address, Memory, ZeroPageAddress};
 pub use traits::IAddress;
-use traits::ISealed;
 #[cfg(test)]
 use utils::catch_unwind_silent;

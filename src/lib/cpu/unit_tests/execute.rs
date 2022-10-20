@@ -8,9 +8,9 @@ fn invalid_instruction_returns_error() {
     // Given
     // Source: https://sites.google.com/site/6502asembly/6502-instruction-set/op-codes-table
     let invalid_instruction = 0xff;
-    let expected_res = Err(ExecutionError::InstructionDecode(invalid_instruction));
+    let expected_res = Err(ExecutionError::IllegalInstruction(invalid_instruction));
     let capacity = 1;
-    let cycle_budget = 1;
+    let cycle_budget = 1.into();
     let memory = {
         let mut tmp = Memory::new(capacity).unwrap();
         tmp[Address::from(0)] = invalid_instruction;
@@ -19,7 +19,7 @@ fn invalid_instruction_returns_error() {
     let mut cpu = Cpu::new(memory);
 
     // When
-    let result = cpu.execute(cycle_budget, Address::from(0));
+    let result = cpu.execute(Address::from(0), cycle_budget);
 
     // Then
     assert!(result == expected_res);
@@ -31,7 +31,7 @@ fn fetch_lda_imm_instruction_sets_expected_mode() {
     // Source: https://web.archive.org/web/20150726112225/http://www.obelisk.demon.co.uk/6502/reference.html#LDA
     let expected_res = Ok(Mode::AFetchImmediateOperand);
     let capacity = 1;
-    let cycle_budget = 1;
+    let cycle_budget = 1.into();
     let memory = {
         let mut tmp = Memory::new(capacity).unwrap();
         tmp[Address::from(0)] = Opcode::LdaImm.into();
@@ -109,10 +109,9 @@ fn execute_lda_zp_instruction_reads_expected_data() {
     let mut cpu = Cpu::new(memory);
 
     // When
-    let result = cpu.execute(cycle_budget, Address::from(0));
+    let result = cpu.execute(Address::from(0), cycle_budget);
 
     // Then
     assert!(result == expected_res);
     assert!(cpu.a() == expected_value);
 }
-
