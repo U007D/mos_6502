@@ -21,10 +21,13 @@ pub use vector_table::VectorTable;
 use crate::{cpu::mode::Mode::Halt, memory::ZeroPageAddress};
 use mode::Mode;
 
+// 6502 stack base set by hardware to end of Page 1
+const MOS_6502_STACK_BASE: u16 = 0x1ff;
+
 #[derive(Eq, Hash, PartialEq)]
 pub struct Cpu {
     pc: Address,
-    sp: ZeroPageAddress,
+    sp: Address,
 
     a: u8,
     x: u8,
@@ -40,7 +43,7 @@ impl Cpu {
         Self {
             memory,
             pc: Address::default(),
-            sp: ZeroPageAddress::default(),
+            sp: Address::from(MOS_6502_STACK_BASE),
             a: u8::default(),
             x: u8::default(),
             y: u8::default(),
@@ -147,7 +150,7 @@ impl Cpu {
     }
 
     #[must_use]
-    pub const fn sp(&self) -> ZeroPageAddress { self.sp }
+    pub const fn sp(&self) -> Address { self.sp }
 
     #[must_use]
     pub const fn status(&self) -> Status { self.status }
