@@ -34,12 +34,11 @@ mod consts;
 pub mod cpu;
 mod error;
 mod memory;
-mod traits;
+pub mod traits;
 mod utils;
 
 pub use cpu::{Cpu, VectorTable};
 pub use error::{Error, Result};
 pub use memory::{Address, Memory, ZeroPageAddress};
-pub use traits::IAddress;
 #[cfg(test)]
 use utils::catch_unwind_silent;

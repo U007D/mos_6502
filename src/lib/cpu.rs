@@ -2,6 +2,7 @@
 mod clock_cycles;
 mod mode;
 mod opcode;
+mod register_id;
 mod stack;
 mod status;
 #[cfg(test)]
@@ -11,16 +12,16 @@ mod vector_table;
 use std::fmt::Debug;
 
 use crate::{error::execution::Result as ExecutionResult, memory::Address, Memory};
-pub use clock_cycles::ClockCycles;
+use clock_cycles::ClockCycles;
 pub use opcode::Opcode;
-pub use stack::Stack;
-pub use status::Status;
+pub use register_id::RegisterId;
+use status::Status;
 pub use vector_table::VectorTable;
 
 use crate::{cpu::mode::Mode::Halt, memory::ZeroPageAddress};
 use mode::Mode;
 
-#[derive(Clone, Eq, Hash, PartialEq)]
+#[derive(Eq, Hash, PartialEq)]
 pub struct Cpu {
     pc: Address,
     sp: ZeroPageAddress,
@@ -60,9 +61,16 @@ impl Cpu {
         let clock_cycles = clock_cycles.into();
         self.pc = start;
         (0_usize..clock_cycles).try_fold(Mode::FetchInstruction, |mode, _cycle| match mode {
-            Mode::AFetchImmediateOperand => {
+            Mode::AFetchImmediateOperand(register_id) => {
+                use RegisterId::*;
+
                 let value = self.fetch_immediate_operand();
-                self.set_a(value);
+                // TODO: Explore dynamic dispatch (without allocation) alternate implementation
+                match register_id {
+                    A => self.set_a(value),
+                    X => self.set_x(value),
+                    Y => self.set_y(value),
+                };
                 Ok(Mode::FetchInstruction)
             },
 
@@ -80,8 +88,10 @@ impl Cpu {
                 use Opcode::*;
 
                 self.fetch_instruction().map(|instruction| match instruction {
-                    LdaImm => Mode::AFetchImmediateOperand,
+                    LdaImm => Mode::AFetchImmediateOperand(RegisterId::A),
                     LdaZp => Mode::AFetchZeroPageOperand,
+                    LdxImm => Mode::AFetchImmediateOperand(RegisterId::X),
+                    LdyImm => Mode::AFetchImmediateOperand(RegisterId::Y),
                 })
             },
 
@@ -109,6 +119,21 @@ impl Cpu {
 
     pub fn set_a(&mut self, value: u8) -> &mut Self {
         self.a = value;
+        self.set_register(value)
+    }
+
+    pub fn set_x(&mut self, value: u8) -> &mut Self {
+        self.x = value;
+        self.set_register(value)
+    }
+
+    pub fn set_y(&mut self, value: u8) -> &mut Self {
+        self.y = value;
+        self.set_register(value)
+    }
+
+    #[inline(always)]
+    pub fn set_register(&mut self, value: u8) -> &mut Self {
         match value {
             0 => {
                 self.status.set_z();

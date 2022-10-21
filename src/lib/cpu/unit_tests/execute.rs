@@ -29,7 +29,7 @@ fn invalid_instruction_returns_error() {
 fn fetch_lda_imm_instruction_sets_expected_mode() {
     // Given
     // Source: https://web.archive.org/web/20150726112225/http://www.obelisk.demon.co.uk/6502/reference.html#LDA
-    let expected_res = Ok(Mode::AFetchImmediateOperand);
+    let expected_res = Ok(Mode::AFetchImmediateOperand(RegisterId::A));
     let capacity = 1;
     let cycle_budget = 1.into();
     let memory = {
@@ -40,7 +40,7 @@ fn fetch_lda_imm_instruction_sets_expected_mode() {
     let mut cpu = Cpu::new(memory);
 
     // When
-    let result = cpu.execute(cycle_budget, Address::from(0));
+    let result = cpu.execute(Address::from(0), cycle_budget);
 
     // Then
     assert!(result == expected_res);
@@ -52,7 +52,7 @@ fn fetch_lda_zp_instruction_sets_expected_mode() {
     // Source: https://web.archive.org/web/20150726112225/http://www.obelisk.demon.co.uk/6502/reference.html#LDA
     let capacity = 1;
     let expected_res = Ok(Mode::AFetchZeroPageOperand);
-    let cycle_budget = 1;
+    let cycle_budget = 1.into();
     let memory = {
         let mut tmp = Memory::new(capacity).unwrap();
         tmp[Address::from(0)] = Opcode::LdaZp.into();
@@ -61,7 +61,7 @@ fn fetch_lda_zp_instruction_sets_expected_mode() {
     let mut cpu = Cpu::new(memory);
 
     // When
-    let result = cpu.execute(cycle_budget, Address::from(0));
+    let result = cpu.execute(Address::from(0), cycle_budget);
 
     // Then
     assert!(result == expected_res);
@@ -74,7 +74,7 @@ fn fetch_lda_zp_operand_reads_expected_zero_page_address_operand() {
     let capacity = 2;
     let data_addr = ZeroPageAddress::from(99);
     let expected_res = Ok(Mode::ADerefZeroPageAddr(data_addr));
-    let cycle_budget = 2;
+    let cycle_budget = 2.into();
     let memory = {
         let mut tmp = Memory::new(capacity).unwrap();
         tmp[Address::from(0)] = Opcode::LdaZp.into();
@@ -84,7 +84,7 @@ fn fetch_lda_zp_operand_reads_expected_zero_page_address_operand() {
     let mut cpu = Cpu::new(memory);
 
     // When
-    let result = cpu.execute(cycle_budget, Address::from(0));
+    let result = cpu.execute(Address::from(0), cycle_budget);
 
     // Then
     assert!(result == expected_res);
@@ -98,7 +98,7 @@ fn execute_lda_zp_instruction_reads_expected_data() {
     let data_addr = ZeroPageAddress::from(99);
     let expected_res = Ok(Mode::FetchInstruction);
     let expected_value = 42;
-    let cycle_budget = 3;
+    let cycle_budget = 3.into();
     let memory = {
         let mut tmp = Memory::new(capacity).unwrap();
         tmp[Address::from(0)] = Opcode::LdaZp.into();

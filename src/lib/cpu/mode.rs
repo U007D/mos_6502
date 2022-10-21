@@ -1,8 +1,10 @@
 use crate::{Cpu, ZeroPageAddress};
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+use crate::cpu::RegisterId;
+
+#[derive(Debug, Eq, Hash, PartialEq)]
 pub enum Mode<'cpu> {
-    AFetchImmediateOperand,
+    AFetchImmediateOperand(RegisterId),
     AFetchZeroPageOperand,
     ADerefZeroPageAddr(ZeroPageAddress),
     FetchInstruction,

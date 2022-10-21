@@ -18,24 +18,27 @@ fn default_initialized_register_returns_expected_value() {
 }
 
 #[test]
-fn modified_register_returns_expected_value() {
+fn modified_register_returns_expected_value_in_expected_register_only() {
     // Given
-    let expected_value = 42;
+    let expected_value_a = 42;
+    let expected_value_xy = u8::default();
     let capacity = 2;
     let cycle_budget = 2.into();
     let memory = {
         let mut tmp = Memory::new(capacity).unwrap();
         // LDA #42
         tmp[Address::from(0)] = Opcode::LdaImm.into();
-        tmp[Address::from(1)] = expected_value;
+        tmp[Address::from(1)] = expected_value_a;
         tmp
     };
     let mut cpu = Cpu::new(memory);
-    cpu.execute(0.into(), cycle_budget).unwrap();
+    cpu.execute(Address::from(0), cycle_budget).unwrap();
 
     // When
-    let result = cpu.a();
+    let (result_a, result_x, result_y) = (cpu.a(), cpu.x(), cpu.y());
 
     // Then
-    assert!(result == expected_value);
+    assert!(result_a == expected_value_a);
+    assert!(result_x == expected_value_xy);
+    assert!(result_y == expected_value_xy);
 }

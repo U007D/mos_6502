@@ -9,6 +9,8 @@ use crate::error::execution::{self, Error, Result};
 pub enum Opcode {
     LdaImm = 0xa9,
     LdaZp  = 0xa5,
+    LdxImm = 0xa2,
+    LdyImm = 0xa0,
 }
 
 impl const From<Opcode> for u8 {
@@ -27,5 +29,7 @@ static U8_TO_OPCODE_LOOKUP: Lazy<HashMap<u8, Opcode>> = Lazy::new(|| {
     let mut lut = HashMap::new();
     lut.insert(Opcode::LdaImm.into(), Opcode::LdaImm);
     lut.insert(Opcode::LdaZp.into(), Opcode::LdaZp);
+    lut.insert(Opcode::LdxImm.into(), Opcode::LdxImm);
+    lut.insert(Opcode::LdyImm.into(), Opcode::LdyImm);
     lut
 });
